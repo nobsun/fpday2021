@@ -1,0 +1,7 @@
+.stack-work/
+fpday2021.cabal
+*.log
+core
+*.hi
+*.o
+*~
