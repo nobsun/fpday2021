@@ -1,0 +1,9 @@
+Top GET
+    IFZERO Bot
+    ADD Sum
+    STORE Sum
+    GOTO Top
+Bot LOAD Sum
+    PRINT
+    STOP
+Sum 0

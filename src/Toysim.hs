@@ -1,23 +1,29 @@
---         font-size: 16pt;
+--         font-size: 22px;
+--     }
+--     h1, h4 {
+--         text-align: center;
 --     }
 -- math: katex
 -- paginate: true
 -- 
 -- ---
-module Toysim
-    ( toy
-    , sampleCode
-    ) where
+-- <!--
+module Toysim where
 
 import Data.Char
 import Data.List
 
--- 
--- ---
+-- -->
 -- # 命令プログラムを関数プログラミングぽく書く
+-- $$
+-- 
+-- $$
+-- #### @nobsun (a.k.a. 山下伸夫)
 -- 
 -- ---
--- ## 関数プログラミングとは
+-- 
+-- 関数プログラミングとは
+-- ---
 -- 
 -- 関数プログラミング
 -- - 「プログラム＝関数」と考えてプログラミングするスタイル
@@ -32,18 +38,15 @@ import Data.List
 -- ---
 -- ## 関数プログラミングぽさは気分の問題
 -- 
--- $$
--- $$
--- $$
--- \begin{array}{lll}
--- & \textbf{命令ぽい} & \textbf{関数ぽい} \\\\
--- \textbf{計算順序} & 出現順序 & データ依存順 \\\\
--- \textbf{思考方向} & ボトムアップ & トップダウン\\\\
--- \textbf{計算結果の伝搬} & 暗黙的、間接的 & 明示的、直接的\\\\
--- \textbf{データアクセス} & ランダム &シーケンシャル\\\\
--- \textbf{計算、入出力} & \text{Eager} & \text{Lazy}
--- \end{array}
--- $$
+-- プログラミングの気分（個人的感想）
+-- | |命令ぽい|関数ぽい|
+-- |-|-|-|
+-- |計算順序|出現順|データ依存順|
+-- |思考方向|ボトムアップ|トップダウン|
+-- |結果伝搬|暗黙的|明示的|
+-- |アクセス|ランダム|シーケンシャル|
+-- |計算態度|オンプレミス|オンデマンド|
+-- |資源消費|節約的几帳面|富豪的無頓着|
 -- 
 -- ---
 -- ## どこまで「関数ぽく」書けるか
@@ -92,6 +95,36 @@ sampleCode = unlines
     , "Sum 0"
     ]
 
+-- ---
+-- ## シミュレーターは入出力をともなうプログラム
+-- 
+toysim :: String -> IO ()
+toysim = interact . wrap  . toy
+
+type Interaction = String -> String
+
+wrap :: Toy -> Interaction
+toy  :: String -> Toy
+
+-- ---
+-- ## トイ・マシンを実行をシミュレートする関数
+-- 
+-- トイ・マシンのシミュレートする関数`toy :: String -> [String] -> [String]`
+-- - ソースコード
+--     - ソースプログラムの型 `String`
+-- - `GET`命令と`PRINT`命令の実行をシミュレートする
+--     - 入力の型 `[String]`
+--     - 出力の型 `[String]`
+-- 
+type Toy = [String] -> [String]
+
+toy code = filter (not . null) . map output
+         . eval . initState (loadProg code)
+    where
+        output (_,_,_,out) = out
+
+wrap f = unlines . f . lines
+
 -- 
 -- ---
 -- ## トイ・マシンの実行
@@ -117,22 +150,6 @@ decode :: Code -> Instruction
 execute :: Instruction -> ToyState -> ToyState
 
 -- 
--- ---
--- ## トイ・マシンを実行をシミュレートする関数
--- 
--- トイ・マシンのシミュレートする関数`toy :: String -> [String] -> [String]`
--- - ソースコード
---     - ソースプログラムの型 `String`
--- - `GET`命令と`PRINT`命令の実行をシミュレートする
---     - 入力の型 `[String]`
---     - 出力の型 `[String]`
--- 
-toy :: String -> ([String] -> [String])
-toy code = filter (not . null) . map output
-         . eval . initState (loadProg code)
-    where
-        output (_,_,_,out) = out
-
 -- ---
 -- プログラムローダー `loadProg :: String -> Memory` の実装
 loadProg :: String -> Memory
