@@ -141,7 +141,7 @@ wrap :: Toy -> Interaction
 toy  :: String -> Toy
 ```
 ---
-## トイ・マシンを実行をシミュレートする関数
+## トイ・マシンの実行をシミュレートする関数
 
 トイ・マシンのシミュレートする関数`toy :: String -> [String] -> [String]`
 - ソースコード
@@ -177,6 +177,54 @@ eval state = state : followings
 ```
 
 ---
+## シミュレーター動かしてみる
+
+```
+main :: IO ()
+main = toysim sampleCode
+```
+
+---
+## トイ用プログラムをファイルから読む
+```
+import System.Environment
+
+main :: IO ()
+main = toysim =<< readFile . head =<< getArgs
+```
+
+---
+## 入力プロンプトを出せるか
+
+```haskell
+iGet :: Operand -> Instruction
+iGet   _ ((sz,mem),acc,ins,out)
+    = if False
+        then ((sz, mem), acc, ins, "Enter a number for GET")
+        else ((sz, tail mem), read (head ins), tail ins, "")
+```
+
+---
+## I/O の順序とデータの依存関係
+
+---
+`step` は `fetch`、`decode`、`execute` の1サイクル分
+```haskell
+step :: ToyState -> ToyState
+step state = execute (decode (fetch state)) state
+
+fetch :: ToyState -> Code
+decode :: Code -> Instruction
+execute :: Instruction -> ToyState -> ToyState
+```
+
+---
+## まとめ
+
+- I/O の順序とデータ依存関係が独立していると命令ぽい
+- I/O の順序をデータ依存関係で決めてよいなら関数ぽく書ける
+
+---
 `ToyState` 実装
 ```haskell
 type ToyState = (Memory, Accumulator, [Input], Output)
@@ -188,17 +236,6 @@ type Accumulator = Int
 type Output = String
 
 type Instruction = ToyState -> ToyState
-```
-
----
-`step` は `fetch`、`decode`、`execute` の1サイクル分
-```haskell
-step :: ToyState -> ToyState
-step state = execute (decode (fetch state)) state
-
-fetch :: ToyState -> Code
-decode :: Code -> Instruction
-execute :: Instruction -> ToyState -> ToyState
 ```
 
 ---
@@ -248,12 +285,9 @@ decode (ope, opd)
 ```
 
 ---
-`iGet, iPrint :: Operand -> Instruction`の実装
+iPrint :: Operand -> Instruction`の実装
 ```haskell
-iGet, iPrint :: Operand -> Instruction
-iGet   _ ((sz,mem),acc,ins,_)
-    = ((sz, tail mem), read (head ins), tail ins, "")
-
+iPrint :: Operand -> Instruction
 iPrint _ ((sz,mem),acc,ins,_) 
     = ((sz, tail mem), acc, ins, show acc)
 ```
