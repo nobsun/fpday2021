@@ -1,0 +1,18 @@
+    get
+    store x
+    get
+    store y
+top ifzero bot
+    load x
+    add mul
+    store mul
+    load y
+    sub 1
+    store y
+    goto top
+bot load mul
+    print
+    stop
+x   0
+y   0
+mul 0

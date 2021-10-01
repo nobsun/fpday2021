@@ -22,6 +22,7 @@ paginate: true
 ---
 <!--
 ```haskell
+{-# LANGUAGE BangPatterns #-}
 module Toysim where
 
 import Data.Char
@@ -96,6 +97,21 @@ $$
 
 ---
 トイ・マシンのプログラム例：数値入力の加算
+```
+Top GET
+    IFZERO Bot
+    ADD Sum
+    STORE Sum
+    GOTO Top
+Bot LOAD Sum
+    PRINT
+    STOP
+Sum 0
+```
+
+<!--
+---
+トイ・マシンのプログラム例：数値入力の加算
 ```haskell
 sampleCode :: String
 sampleCode = unlines
@@ -110,6 +126,8 @@ sampleCode = unlines
     , "Sum 0"
     ]
 ```
+-->
+
 ---
 ## シミュレーターは入出力をともなうプログラム
 
@@ -159,6 +177,20 @@ eval state = state : followings
 ```
 
 ---
+`ToyState` 実装
+```haskell
+type ToyState = (Memory, Accumulator, [Input], Output)
+
+type Memory = (Int, [(Label, Content)])
+
+type Input = String
+type Accumulator = Int
+type Output = String
+
+type Instruction = ToyState -> ToyState
+```
+
+---
 `step` は `fetch`、`decode`、`execute` の1サイクル分
 ```haskell
 step :: ToyState -> ToyState
@@ -181,61 +213,6 @@ loadProg src = (,) . length <*> cycle . map conv $ lines $ map toUpper src
 ```haskell
 initState :: Memory -> [Input] -> ToyState
 initState mem input = (mem, 0, input, "")
-```
-
----
-`ToyState` 実装
-```haskell
-type ToyState = (Memory, Accumulator, [Input], Output)
-
-type Memory = (Int, [(Label, Content)])
-
-type Input = String
-type Accumulator = Int
-type Output = String
-
-type Instruction = ToyState -> ToyState
-```
-
----
-メモリ `[(Label, Content)]` の実装
-```haskell
-type Label = String
-
-data Content
-    = Code Code
-    | Data Data
-
-type Code = (Operator, Operand)
-
-type Data = Int
-```
-
----
-`Operator` 実装
-```haskell
-data Operator
-    = GET
-    | PRINT
-    | STOP
-    | LOAD
-    | STORE
-    | ADD
-    | SUB
-    | GOTO
-    | IFPOS
-    | IFZERO
-    deriving (Eq, Ord, Enum, Show, Read)
-```
-
----
-`Operand` 実装
-```haskell
-data Operand
-    = None
-    | Number Int
-    | Label Label
-    deriving (Eq, Show)
 ```
 
 ---
@@ -279,6 +256,47 @@ iGet   _ ((sz,mem),acc,ins,_)
 
 iPrint _ ((sz,mem),acc,ins,_) 
     = ((sz, tail mem), acc, ins, show acc)
+```
+
+---
+メモリ `[(Label, Content)]` の実装
+```haskell
+type Label = String
+
+data Content
+    = Code Code
+    | Data Data
+
+type Code = (Operator, Operand)
+
+type Data = Int
+```
+
+---
+`Operator` 実装
+```haskell
+data Operator
+    = GET
+    | PRINT
+    | STOP
+    | LOAD
+    | STORE
+    | ADD
+    | SUB
+    | GOTO
+    | IFPOS
+    | IFZERO
+    deriving (Eq, Ord, Enum, Show, Read)
+```
+
+---
+`Operand` 実装
+```haskell
+data Operand
+    = None
+    | Number Int
+    | Label Label
+    deriving (Eq, Show)
 ```
 
 ---

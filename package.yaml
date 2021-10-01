@@ -41,6 +41,26 @@ executables:
     dependencies:
     - fpday2021
 
+  # toysim2:
+  #   main:                toysim2.hs
+  #   source-dirs:         app
+  #   ghc-options:
+  #   - -rtsopts
+  #   # - -threaded
+  #   # - -with-rtsopts=-N
+  #   dependencies:
+  #   - fpday2021
+
+  # toysim3:
+  #   main:                toysim3.hs
+  #   source-dirs:         app
+  #   ghc-options:
+  #   - -rtsopts
+  #   # - -threaded
+  #   # - -with-rtsopts=-N
+  #   dependencies:
+  #   - fpday2021
+
 tests:
   fpday2021-test:
     main:                spec.hs
