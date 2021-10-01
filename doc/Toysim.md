@@ -199,7 +199,7 @@ main = toysim =<< readFile . head =<< getArgs
 ```haskell
 iGet :: Operand -> Instruction
 iGet   _ ((sz,mem),acc,ins,out)
-    = if False
+    = if null out
         then ((sz, mem), acc, ins, "Enter a number for GET")
         else ((sz, tail mem), read (head ins), tail ins, "")
 ```
@@ -211,7 +211,7 @@ iGet   _ ((sz,mem),acc,ins,out)
 `step` は `fetch`、`decode`、`execute` の1サイクル分
 ```haskell
 step :: ToyState -> ToyState
-step state = execute (decode (fetch state)) state
+step state@(_,!_,_,_) = execute (decode (fetch state)) state
 
 fetch :: ToyState -> Code
 decode :: Code -> Instruction
@@ -285,7 +285,7 @@ decode (ope, opd)
 ```
 
 ---
-iPrint :: Operand -> Instruction`の実装
+`iPrint :: Operand -> Instruction`の実装
 ```haskell
 iPrint :: Operand -> Instruction
 iPrint _ ((sz,mem),acc,ins,_) 

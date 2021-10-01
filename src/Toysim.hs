@@ -191,7 +191,7 @@ iGet   _ ((sz,mem),acc,ins,out)
 -- ---
 -- `step` は `fetch`、`decode`、`execute` の1サイクル分
 step :: ToyState -> ToyState
-step state = execute (decode (fetch state)) state
+step state@(_,!_,_,_) = execute (decode (fetch state)) state
 
 fetch :: ToyState -> Code
 decode :: Code -> Instruction
@@ -259,7 +259,7 @@ decode (ope, opd)
 
 -- 
 -- ---
--- iPrint :: Operand -> Instruction`の実装
+-- `iPrint :: Operand -> Instruction`の実装
 iPrint :: Operand -> Instruction
 iPrint _ ((sz,mem),acc,ins,_) 
     = ((sz, tail mem), acc, ins, show acc)
